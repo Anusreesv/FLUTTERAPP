@@ -1,7 +1,6 @@
-import 'package:first_app/services/api_service.dart';
 import 'package:flutter/material.dart';
-// import 'api_service.dart'; // Import your API service
-import 'package:first_app/models/user.dart'; // Import your User model
+import 'package:first_app/models/user.dart';
+import 'package:first_app/services/api_service.dart';
 
 class NewUserScreen extends StatefulWidget {
   const NewUserScreen({super.key});
@@ -12,9 +11,9 @@ class NewUserScreen extends StatefulWidget {
 
 class _NewUserScreenState extends State<NewUserScreen> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController nameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  bool isUserActive = true; // Default to active
+  late String _name;
+  late String _email;
+  bool _status = false;
 
   @override
   Widget build(BuildContext context) {
@@ -29,83 +28,78 @@ class _NewUserScreenState extends State<NewUserScreen> {
           child: Column(
             children: [
               TextFormField(
-                controller: nameController,
                 decoration: const InputDecoration(labelText: 'Name'),
                 validator: (value) {
-                  if (value!.isEmpty) {
+                  if (value == null || value.isEmpty) {
                     return 'Please enter a name';
                   }
                   return null;
                 },
+                onSaved: (value) => _name = value!,
               ),
               TextFormField(
-                controller: emailController,
                 decoration: const InputDecoration(labelText: 'Email'),
                 validator: (value) {
-                  if (value!.isEmpty || !value.contains('@')) {
+                  if (value == null || value.isEmpty || !isValidEmail(value)) {
                     return 'Please enter a valid email address';
                   }
                   return null;
                 },
+                onSaved: (value) => _email = value!,
               ),
               SwitchListTile(
-                title: const Text('Active User'),
-                value: isUserActive,
+                title: const Text('Status'),
+                value: _status,
                 onChanged: (value) {
                   setState(() {
-                    isUserActive = value;
+                    _status = value;
                   });
                 },
               ),
               ElevatedButton(
-  onPressed: () {
-    if (_formKey.currentState!.validate()) {
-      // Create a new user object
-      final newUser = User(
-        id: 0, // You can assign 0 or null for a new user
-        name: nameController.text,
-        email: emailController.text,
-        status: isUserActive,
-      );
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
 
-      // Call your API service to create the new user
-      ApiService.createUser(newUser).then((createdUser) {
-        // Handle the response
-        if (createdUser!= null) {
-          // User was successfully created, you can show a success message or navigate back
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('User created successfully'),
-            ),
-          );
-
-          // Navigate back to the previous screen
-          Navigator.pop(context);
-        } else {
-          // Handle any errors or display an error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to create user'),
-            ),
-          );
-        }
-      }).catchError((error) {
-        // Handle API error if needed
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('API request error: $error'),
-          ),
-        );
-      });
-    }
-  },
-  child: const Text('Create User'),
-),
-
+                    try {
+                      await ApiService.createUser(User(id: 0, name: _name, email: _email, status: _status));
+                      Navigator.pop(context, true); // Indicate successful user creation
+                    } catch (e) {
+                      print('Error creating user: $e');
+                      showErrorDialog(context, 'Failed to create user. Please try again.');
+                    }
+                  }
+                },
+                child: const Text('Create User'),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  bool isValidEmail(String email) {
+    return email.contains('@');
+  }
+
+  void showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

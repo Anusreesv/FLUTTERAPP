@@ -15,7 +15,7 @@ class User extends HomeScreen {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id: json['id'] as int,
       name: json['name'] as String,
       email: json['email'] as String,
       status: json['status'] != null && json['status'].toLowerCase() == 'active',

@@ -1,8 +1,9 @@
+import 'package:first_app/config.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/models/user.dart';
 import 'package:first_app/services/api_service.dart';
 import 'package:first_app/widgets/user_list_item.dart';
-import 'package:first_app/config.dart';
+import 'new_user_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -17,8 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-   users = ApiService.fetchUsers('${AppConfig.baseUrl}${AppConfig.userListEndpoint}');
-
+    users = ApiService.fetchUsers('${AppConfig.baseUrl}${AppConfig.userListEndpoint}');
   }
 
   @override
@@ -56,6 +56,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>  const NewUserScreen()),
+          ).then((value) {
+            // Refresh the user list when returning from the NewUserScreen
+            if (value == true) {
+              setState(() {
+                users = ApiService.fetchUsers('${AppConfig.baseUrl}${AppConfig.userListEndpoint}');
+              });
+            }
+          });
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

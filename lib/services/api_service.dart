@@ -6,7 +6,6 @@ import 'package:first_app/config.dart';
 class ApiService {
   static const String baseUrl = AppConfig.baseUrl;
   static const String accessToken = 'd6fdcd7f7f6dd7c967d99cad24745cf7a9e6b2113e59968a230cc1574471168e';
-  
 
   static Future<List<User>> fetchUsers(String url) async {
     final response = await http.get(Uri.parse(url));
@@ -16,7 +15,7 @@ class ApiService {
       final users = usersData.map((userData) => User.fromJson(userData)).toList();
       return users;
     } else {
-      throw Exception('Failed to load user data');
+      throw Exception('Failed to load user data. Status code: ${response.statusCode}');
     }
   }
 
@@ -34,7 +33,7 @@ class ApiService {
         Uri.parse(createUserUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $accessToken ', // Uncomment and replace with your API key if required
+          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode(userData),
       );
@@ -42,13 +41,10 @@ class ApiService {
       if (response.statusCode == 201) {
         print('User created successfully');
       } else {
-        print('Failed to create user. Status code: ${response.statusCode}');
-        print('Response body: ${response.body}');
-        throw Exception('Failed to create user: ${response.statusCode}');
+        throw Exception('Failed to create user. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Exception during user creation: $e');
-      throw Exception('Failed to create user');
+      throw Exception('Exception during user creation: $e');
     }
   }
 
@@ -71,18 +67,23 @@ class ApiService {
         body: jsonEncode(userData),
       );
 
-      if (response.statusCode == 200) {
+    if (response.statusCode == 200) {
         print('User updated successfully');
       } else {
-        print('Failed to update user. Status code: ${response.statusCode}');
-        print('Response body: ${response.body}');
-        throw Exception('Failed to update user');
+        _handleUpdateError(response.statusCode, user.id);
       }
     } catch (e) {
-      print('Exception during user update: $e');
-      throw Exception('Failed to update user');
+      throw Exception('Exception during user update: $e');
+    }
+  }
+
+  // Private method to handle update error based on status code
+  static void _handleUpdateError(int statusCode, int userId) {
+    if (statusCode == 404) {
+      throw Exception('User with ID $userId not found. Cannot update non-existent user.');
+    } else {
+      throw Exception('Failed to update user. Status code: $statusCode');
     }
   }
 }
-
 

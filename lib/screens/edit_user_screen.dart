@@ -5,7 +5,7 @@ import 'package:first_app/services/api_service.dart';
 class EditUserScreen extends StatefulWidget {
   final User user;
 
-  const EditUserScreen(this.user, {Key? key}) : super(key: key);
+  const EditUserScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   _EditUserScreenState createState() => _EditUserScreenState();
@@ -77,12 +77,18 @@ class _EditUserScreenState extends State<EditUserScreen> {
                   status: _editedStatus,
                 );
 
-                try {
+                 try {
                   await ApiService.updateUser(editedUser);
                   Navigator.pop(context);
                 } catch (e) {
                   // Handle error, show a message or log it
                   print('Failed to update user: $e');
+                  // Show a snackbar or dialog to inform the user about the failure
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to update user. Please try again.'),
+                    ),
+                  );
                 }
               },
               child: const Text('Save Changes'),

@@ -1,19 +1,29 @@
-import 'package:first_app/models/user.dart';
+
 import 'package:flutter/material.dart';
-// import 'models/user.dart';
+import 'package:first_app/models/user.dart';
+import 'package:first_app/screens/edit_user_screen.dart';
 
 class UserListItem extends StatelessWidget {
   final User user;
 
-  const UserListItem(this.user, {super.key});
+  const UserListItem(this.user, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(user.name),
       subtitle: Text(user.email),
-      trailing: const Icon(Icons.edit), // Add an edit icon
-      // Implement onTap handler to view user details
+      trailing: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditUserScreen(user: user), // Pass the user object here
+            ),
+          );
+        },
+        child: const Icon(Icons.edit),
+      ),
     );
   }
 }

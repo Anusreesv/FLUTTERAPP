@@ -1,30 +1,25 @@
+import 'package:first_app/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/models/user.dart';
 import 'package:first_app/screens/edit_user_screen.dart'; 
 
-class UserListItem extends StatelessWidget {
-  final User user;
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MyApp());
+}
 
-  const UserListItem(this.user, {super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(user.name),
-      subtitle: Text(user.email),
-      trailing: GestureDetector(
-        
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EditUserScreen(user),
-            ),
-            
-          );
-        },
-      ),
-      
+    return MaterialApp(
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomeScreen(),
+        '/editUser': (context) => const EditUserScreen(user: User(id: 1, name: "John", email: "john@example.com", status: false)),
+        // Add other routes as needed
+      },
     );
   }
 }

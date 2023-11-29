@@ -2,8 +2,9 @@ import 'package:first_app/config.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/models/user.dart';
 import 'package:first_app/services/api_service.dart';
+import 'package:first_app/screens/new_user_screen.dart';
+import 'package:first_app/screens/user_details_screen.dart';
 import 'package:first_app/widgets/user_list_item.dart';
-import 'new_user_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -19,6 +20,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     users = ApiService.fetchUsers('${AppConfig.baseUrl}${AppConfig.userListEndpoint}');
+  }
+
+  Future<void> updateUser(User updatedUser) async {
+    try {
+      await ApiService.updateUser(updatedUser);
+      setState(() {
+        users = ApiService.fetchUsers('${AppConfig.baseUrl}${AppConfig.userListEndpoint}');
+      });
+    } catch (e) {
+      print('Failed to update user: $e');
+    }
   }
 
   @override
@@ -42,16 +54,32 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
+                      crossAxisSpacing: 2.0,
+                      mainAxisSpacing: 2.0,
                     ),
+                    padding: const EdgeInsets.all(2.0),
                     itemCount: userList?.length,
                     itemBuilder: (context, index) {
-                      return UserListItem(userList![index]);
+                      return Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: UserListItem(userList![index], onUpdate: updateUser),
+                      );
                     },
                   )
                 : ListView.builder(
                     itemCount: userList?.length,
                     itemBuilder: (context, index) {
-                      return UserListItem(userList![index]);
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserDetailsScreen(userList[index]),
+                            ),
+                          );
+                        },
+                        child: UserListItem(userList![index], onUpdate: updateUser),
+                      );
                     },
                   );
           }
@@ -61,9 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) =>  const NewUserScreen()),
+            MaterialPageRoute(builder: (context) => const NewUserScreen()),
           ).then((value) {
-            // Refresh the user list when returning from the NewUserScreen
             if (value == true) {
               setState(() {
                 users = ApiService.fetchUsers('${AppConfig.baseUrl}${AppConfig.userListEndpoint}');

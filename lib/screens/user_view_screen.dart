@@ -1,29 +1,16 @@
 import 'package:first_app/models/user.dart';
 import 'package:flutter/material.dart';
-// import 'models/user.dart';
 
 class UserViewScreen extends StatefulWidget {
   final User user;
 
-  const UserViewScreen(this.user, {super.key});
+  const UserViewScreen(this.user, {Key? key}) : super(key: key);
 
   @override
   _UserViewScreenState createState() => _UserViewScreenState();
 }
 
 class _UserViewScreenState extends State<UserViewScreen> {
-  late TextEditingController nameController;
-  late TextEditingController emailController;
-  late bool isUserActive;
-
-  @override
-  void initState() {
-    super.initState();
-    nameController = TextEditingController(text: widget.user.name);
-    emailController = TextEditingController(text: widget.user.email);
-    isUserActive = widget.user.status;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,6 +38,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
             Text('Name: ${widget.user.name}'),
             Text('Email: ${widget.user.email}'),
             Text('Status: ${widget.user.status ? 'Active' : 'Inactive'}'),
+            Text('Gender: ${widget.user.gender}'), // Display gender
           ],
         ),
       ),
@@ -61,7 +49,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
 class UserEditForm extends StatefulWidget {
   final User user;
 
-  const UserEditForm({super.key, required this.user});
+  const UserEditForm({Key? key, required this.user}) : super(key: key);
 
   @override
   _UserEditFormState createState() => _UserEditFormState();
@@ -72,6 +60,7 @@ class _UserEditFormState extends State<UserEditForm> {
   late TextEditingController nameController;
   late TextEditingController emailController;
   late bool isUserActive;
+  late TextEditingController genderController; // Add gender controller
 
   @override
   void initState() {
@@ -79,6 +68,7 @@ class _UserEditFormState extends State<UserEditForm> {
     nameController = TextEditingController(text: widget.user.name);
     emailController = TextEditingController(text: widget.user.email);
     isUserActive = widget.user.status;
+    genderController = TextEditingController(text: widget.user.gender); // Initialize gender controller
   }
 
   @override
@@ -113,6 +103,14 @@ class _UserEditFormState extends State<UserEditForm> {
                   return null;
                 },
               ),
+              TextFormField(
+                controller: genderController,
+                decoration: const InputDecoration(labelText: 'Gender'),
+                validator: (value) {
+                  // Add gender validation logic if needed
+                  return null;
+                },
+              ),
               SwitchListTile(
                 title: const Text('Active User'),
                 value: isUserActive,
@@ -131,6 +129,7 @@ class _UserEditFormState extends State<UserEditForm> {
                       name: nameController.text,
                       email: emailController.text,
                       status: isUserActive,
+                      gender: genderController.text, // Set gender from controller
                     );
 
                     // Implement API request to update user information

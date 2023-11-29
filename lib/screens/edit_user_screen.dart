@@ -12,16 +12,18 @@ class EditUserScreen extends StatefulWidget {
 }
 
 class _EditUserScreenState extends State<EditUserScreen> {
-  late String _editedName;
-  late String _editedEmail;
-  bool _editedStatus = false;
+  late TextEditingController nameController;
+  late TextEditingController emailController;
+  late TextEditingController genderController; // Add gender controller
+  late bool status;
 
   @override
   void initState() {
     super.initState();
-    _editedName = widget.user.name;
-    _editedEmail = widget.user.email;
-    _editedStatus = widget.user.status;
+    nameController = TextEditingController(text: widget.user.name);
+    emailController = TextEditingController(text: widget.user.email);
+    genderController = TextEditingController(text: widget.user.gender); // Initialize gender controller
+    status = widget.user.status;
   }
 
   @override
@@ -33,65 +35,57 @@ class _EditUserScreenState extends State<EditUserScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextFormField(
+            TextField(
+              controller: nameController,
               decoration: const InputDecoration(labelText: 'Name'),
-              initialValue: _editedName,
-              onChanged: (value) {
-                setState(() {
-                  _editedName = value;
-                });
-              },
             ),
-            TextFormField(
+            TextField(
+              controller: emailController,
               decoration: const InputDecoration(labelText: 'Email'),
-              initialValue: _editedEmail,
-              onChanged: (value) {
-                setState(() {
-                  _editedEmail = value;
-                });
-              },
             ),
-            SwitchListTile(
-              title: const Text('Status'),
-              value: _editedStatus,
-              onChanged: (value) {
-                setState(() {
-                  _editedStatus = value;
-                });
-              },
+            TextField(
+              controller: genderController,
+              decoration: const InputDecoration(labelText: 'Gender'),
             ),
-            IconButton(
-  icon: const Icon(Icons.edit),
-  onPressed: () {
-    Navigator.pushNamed(context, '/editUser');
-  },
-),
-
+            Row(
+              children: [
+                const Text('Status:'),
+                Switch(
+                  value: status,
+                  onChanged: (value) {
+                    setState(() {
+                      status = value;
+                    });
+                  },
+                ),
+              ],
+            ),
             ElevatedButton(
               onPressed: () async {
-                User editedUser = User(
+                // Update the user and refresh the user list
+                final updatedUser = User(
                   id: widget.user.id,
-                  name: _editedName,
-                  email: _editedEmail,
-                  status: _editedStatus,
+                  name: nameController.text,
+                  email: emailController.text,
+                  gender: genderController.text, // Get gender from controller
+                  status: status,
                 );
 
-                 try {
-                  await ApiService.updateUser(editedUser);
-                  Navigator.pop(context);
-                } catch (e) {
-                  // Handle error, show a message or log it
-                  print('Failed to update user: $e');
-                  // Show a snackbar or dialog to inform the user about the failure
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Failed to update user. Please try again.'),
-                    ),
-                  );
-                }
+                await ApiService.updateUser(updatedUser);
+
+                // Update the local user object in the widget
+                setState(() {
+                  widget.user.name = updatedUser.name;
+                  widget.user.email = updatedUser.email;
+                  widget.user.gender = updatedUser.gender;
+                  widget.user.status = updatedUser.status;
+                });
+
+                Navigator.pop(context); // Return to the previous screen
               },
-              child: const Text('Save Changes'),
+              child: const Text('Update User'),
             ),
           ],
         ),

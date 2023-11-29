@@ -1,25 +1,29 @@
-import 'package:first_app/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/models/user.dart';
-import 'package:first_app/screens/edit_user_screen.dart'; 
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
-}
+class UserDetailsScreen extends StatelessWidget {
+  final User user;
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const UserDetailsScreen(this.user, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const HomeScreen(),
-        '/editUser': (context) => const EditUserScreen(user: User(id: 1, name: "John", email: "john@example.com", status: false)),
-        // Add other routes as needed
-      },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(user.name),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('ID: ${user.id}'),
+            Text('Name: ${user.name}'),
+            Text('Email: ${user.email}'),
+            Text('Status: ${user.status ? 'Active' : 'Inactive'}'),
+          ],
+        ),
+      ),
     );
   }
 }

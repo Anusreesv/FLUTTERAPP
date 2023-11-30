@@ -18,15 +18,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    // Initialize state if needed
     super.initState();
-    users = ApiService.fetchUsers('${AppConfig.baseUrl}${AppConfig.userListEndpoint}');
   }
 
   Future<void> updateUser(User updatedUser) async {
     try {
-      await ApiService.updateUser(updatedUser);
+      print('updating user from home screen');
+      print('calling update user');
       setState(() {
-        users = ApiService.fetchUsers('${AppConfig.baseUrl}${AppConfig.userListEndpoint}');
+        // Update the state if needed
       });
     } catch (e) {
       print('Failed to update user: $e');
@@ -40,7 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('User List'),
       ),
       body: FutureBuilder<List<User>>(
-        future: users,
+        future: ApiService.fetchUsers(
+          '${AppConfig.baseUrl}${AppConfig.userListEndpoint}',
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -51,18 +54,32 @@ class _HomeScreenState extends State<HomeScreen> {
             final isDesktop = MediaQuery.of(context).size.width > 600;
 
             return isDesktop
-                ? GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 2.0,
-                      mainAxisSpacing: 2.0,
-                    ),
-                    padding: const EdgeInsets.all(2.0),
-                    itemCount: userList?.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
+                ? LayoutBuilder(
+                    builder: (context, constraints) {
+                    int width = constraints.maxWidth ~/400;
+                    final crossAxisCounts = width == 0 ? 1: width;
+                      
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCounts,
+                          mainAxisExtent: 100,
+                          mainAxisSpacing: 2,
+                          crossAxisSpacing: 2,
+                        ),
                         padding: const EdgeInsets.all(2.0),
-                        child: UserListItem(userList![index], onUpdate: updateUser),
+                        itemCount: userList?.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            color:Colors.amberAccent,
+                            child:Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: UserListItem(userList![index],
+                                    onUpdate: updateUser),
+                            )
+                            
+                          );
+                        },
                       );
                     },
                   )

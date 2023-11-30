@@ -8,7 +8,12 @@ class ApiService {
   static const String accessToken = 'd6fdcd7f7f6dd7c967d99cad24745cf7a9e6b2113e59968a230cc1574471168e';
 
   static Future<List<User>> fetchUsers(String url) async {
-    final response = await http.get(Uri.parse('$baseUrl/public/v2/users'));
+    final response = await http.get(Uri.parse('$baseUrl/public/v2/users'),
+     headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },);
+    
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final usersData = List<Map<String, dynamic>>.from(data);
@@ -63,7 +68,7 @@ class ApiService {
       'name': user.name,
       'email': user.email,
       'gender':user.gender,
-      'status': user.status.toString(), // Convert boolean to string
+      'status': user.status ? 'active': 'inactive', // Convert boolean to string
     };
 
     try {

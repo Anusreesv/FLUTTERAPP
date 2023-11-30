@@ -1,4 +1,3 @@
-// new_user_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:first_app/models/user.dart';
@@ -10,6 +9,7 @@ class NewUserScreen extends StatefulWidget {
   @override
   _NewUserScreenState createState() => _NewUserScreenState();
 }
+
 
 class _NewUserScreenState extends State<NewUserScreen> {
   final TextEditingController nameController = TextEditingController();
@@ -82,7 +82,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
               child: const Text('Create User'),
             ),
           ],
-        ),
+        ),  
       ),
     );
   }

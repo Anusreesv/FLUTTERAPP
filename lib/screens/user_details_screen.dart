@@ -20,6 +20,7 @@ class UserDetailsScreen extends StatelessWidget {
             Text('ID: ${user.id}'),
             Text('Name: ${user.name}'),
             Text('Email: ${user.email}'),
+            Text('gender: ${user.gender}'),
             Text('Status: ${user.status ? 'Active' : 'Inactive'}'),
           ],
         ),

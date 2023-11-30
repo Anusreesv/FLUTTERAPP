@@ -83,7 +83,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
                   widget.user.status = updatedUser.status;
                 });
 
-                Navigator.pop(context); // Return to the previous screen
+                Navigator.pop(context, updatedUser); // Return to the previous screen
               },
               child: const Text('Update User'),
             ),

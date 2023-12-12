@@ -13,6 +13,7 @@ class ConnectivityUtil {
       builder: (context) => AlertDialog(
         title: const Text('No Internet Connection'),
         content: const Text('Please check your internet connection.'),
+        
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

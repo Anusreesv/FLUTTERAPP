@@ -1,10 +1,12 @@
-import 'package:first_app/config.dart';
 import 'package:flutter/material.dart';
+import 'package:first_app/config.dart';
 import 'package:first_app/models/user.dart';
 import 'package:first_app/services/api_service.dart';
 import 'package:first_app/screens/new_user_screen.dart';
 import 'package:first_app/screens/user_details_screen.dart';
 import 'package:first_app/widgets/user_list_item.dart';
+import 'package:first_app/utils/local_storage.dart';
+import 'package:first_app/utils/connectivity_util.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -20,6 +22,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // Initialize state if needed
     super.initState();
+    // Load form data from local storage when the screen is opened
+    LocalStorage.loadFormData().then((formData) {
+      // Use formData as needed
+    });
+
+    // Check internet connection when the screen is opened
+    checkInternetConnection();
   }
 
   Future<void> updateUser(User updatedUser) async {
@@ -31,6 +40,12 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     } catch (e) {
       print('Failed to update user: $e');
+    }
+  }
+
+  Future<void> checkInternetConnection() async {
+    if (!(await ConnectivityUtil.hasConnection())) {
+      ConnectivityUtil.showNoInternetDialog(context);
     }
   }
 
@@ -56,9 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
             return isDesktop
                 ? LayoutBuilder(
                     builder: (context, constraints) {
-                    int width = constraints.maxWidth ~/400;
-                    final crossAxisCounts = width == 0 ? 1: width;
-                      
+                      int width = constraints.maxWidth ~/ 400;
+                      final crossAxisCounts = width == 0 ? 1 : width;
+
                       return GridView.builder(
                         shrinkWrap: true,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -71,13 +86,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemCount: userList?.length,
                         itemBuilder: (context, index) {
                           return Container(
-                            color:const Color.fromARGB(255, 255, 64, 169),
-                            child:Padding(
+                            color: const Color.fromARGB(255, 255, 64, 169),
+                            child: Padding(
                               padding: const EdgeInsets.all(2.0),
-                              child: UserListItem(userList![index],
-                                    onUpdate: updateUser),
-                            )
-                            
+                              child: UserListItem(
+                                userList![index],
+                                onUpdate: updateUser,
+                              ),
+                            ),
                           );
                         },
                       );
@@ -91,11 +107,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => UserDetailsScreen(userList[index]),
+                              builder: (context) =>
+                                  UserDetailsScreen(userList[index]),
                             ),
                           );
                         },
-                        child: UserListItem(userList![index], onUpdate: updateUser),
+                        child: UserListItem(
+                          userList![index],
+                          onUpdate: updateUser,
+                        ),
                       );
                     },
                   );
@@ -110,7 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ).then((value) {
             if (value == true) {
               setState(() {
-                users = ApiService.fetchUsers('${AppConfig.baseUrl}${AppConfig.userListEndpoint}');
+                users = ApiService.fetchUsers(
+                    '${AppConfig.baseUrl}${AppConfig.userListEndpoint}');
               });
             }
           });

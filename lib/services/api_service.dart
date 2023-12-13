@@ -8,12 +8,14 @@ class ApiService {
   static const String accessToken = 'd6fdcd7f7f6dd7c967d99cad24745cf7a9e6b2113e59968a230cc1574471168e';
 
   static Future<List<User>> fetchUsers(String url) async {
-    final response = await http.get(Uri.parse('$baseUrl/public/v2/users'),
-     headers: {
+    final response = await http.get(
+      Uri.parse('$baseUrl/public/v2/users'),
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $accessToken',
-      },);
-    
+      },
+    );
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final usersData = List<Map<String, dynamic>>.from(data);
@@ -25,41 +27,65 @@ class ApiService {
   }
 
   static Future<void> createUser(User user) async {
-  const String createUserUrl = '$baseUrl/public/v2/users';
+    const String createUserUrl = '$baseUrl/public/v2/users';
 
-  final Map<String, dynamic> userData = {
-    'name': user.name,
-    'email': user.email,
-    'gender': user.gender,
-    'status': user.status,
-  };
+    final Map<String, dynamic> userData = {
+      'name': user.name,
+      'email': user.email,
+      'gender': user.gender,
+      'status': user.status ? 'active' : 'inactive',
+    };
 
-  print('Create User Request Payload: ${jsonEncode(userData)}');
+    print('Create User Request Payload: ${jsonEncode(userData)}');
 
-  try {
-    final response = await http.post(
-      Uri.parse(createUserUrl),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $accessToken',
-      },
-      body: jsonEncode(userData),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(createUserUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(userData),
+      );
 
-    print('Response Status Code: ${response.statusCode}');
-    print('Response Body: ${response.body}');
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
-    if (response.statusCode == 201) {
-      print('User created successfully');
-    } else {
-      throw ApiException('Failed to create user. Status code: ${response.statusCode}');
+      if (response.statusCode == 201) {
+        print('User created successfully');
+      } else {
+        _handleCreateError(response.statusCode, response.body);
+      }
+    } catch (e) {
+      print('Error during user creation: $e');
+      throw ApiException('Exception during user creation: $e');
     }
-  } catch (e) {
-    print('Error during user creation: $e');
-    throw ApiException('Exception during user creation: $e');
   }
-}
 
+  static void _handleCreateError(int statusCode, String responseBody) {
+    if (statusCode == 422) {
+      _handleCreateValidationErrors(responseBody);
+    } else {
+      print('Unknown error during user creation. Status code: $statusCode');
+      throw ApiException('Failed to create user. Status code: $statusCode');
+    }
+  }
+
+  static void _handleCreateValidationErrors(String responseBody) {
+    final List<dynamic> errors = jsonDecode(responseBody);
+
+    if (errors.isNotEmpty) {
+      for (var error in errors) {
+        final String field = error['field'];
+        final String message = error['message'];
+        final String friendlyErrorMessage = 'Validation error: $field $message';
+        print(friendlyErrorMessage);
+      }
+    } else {
+      print('Unknown validation error format: $errors');
+      throw ApiException('Failed to create user. Status code: 422');
+    }
+  }
 
   static Future<void> updateUser(User user) async {
     final String updateUserUrl = '$baseUrl/public/v2/users/${user.id}';
@@ -67,8 +93,8 @@ class ApiService {
     final Map<String, dynamic> userData = {
       'name': user.name,
       'email': user.email,
-      'gender':user.gender,
-      'status': user.status ? 'active': 'inactive', // Convert boolean to string
+      'gender': user.gender,
+      'status': user.status ? 'active' : 'inactive',
     };
 
     try {
@@ -91,26 +117,27 @@ class ApiService {
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
 
-       if (response.statusCode == 200 || response.statusCode == 422) {
-  print('User updated successfully');
-  // Update user details in your app here
-  user.name = userData['name'];
-  user.email = userData['email'];
-  user.gender= userData['gender'];
-  user.status = userData['status'] == 'true'; // Convert string to boolean
-
-  
-} else {
-  _handleUpdateError(response.statusCode, response.body, user);
-}
-
-  } catch (e) {
-    throw ApiException('Exception during user update: $e');
+      if (response.statusCode == 200 || response.statusCode == 422) {
+        print('User updated successfully');
+        user.name = userData['name'];
+        user.email = userData['email'];
+        user.gender = userData['gender'];
+        user.status = userData['status'] == 'true';
+      } else {
+        _handleUpdateError(response.statusCode, response.body, user);
+      }
+    } catch (e) {
+      throw ApiException('Exception during user update: $e');
+    }
   }
-}
 
   static void _handleUpdateError(int statusCode, String responseBody, User user) {
-    // Implement your error handling logic here
+    if (statusCode == 422) {
+      _handleUpdateValidationErrors(responseBody, user);
+    } else {
+      print('Unknown error during user update. Status code: $statusCode');
+      throw ApiException('Failed to update user. Status code: $statusCode');
+    }
   }
 
   static void _handleUpdateValidationErrors(String responseBody, User user) {
@@ -123,15 +150,6 @@ class ApiService {
         final String friendlyErrorMessage = 'Validation error: $field $message';
         print(friendlyErrorMessage);
       }
-
-      // Proceeding with user update despite validation errors
-      print('Proceeding with user update despite validation errors');
-
-      // Update user details in your app here
-      user.name = user.name; // Replace with actual logic based on your requirements
-      user.email = user.email;
-      user.gender =user.gender;
-      user.status = user.status; // Update as needed
     } else {
       print('Unknown validation error format: $errors');
       throw ApiException('Failed to update user. Status code: 422');

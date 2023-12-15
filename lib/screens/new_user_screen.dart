@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:first_app/models/user.dart';
 import 'package:first_app/services/api_service.dart';
+import 'package:first_app/utils/connectivity_util.dart'; // Import connectivity_util.dart
 
 class NewUserScreen extends StatefulWidget {
   const NewUserScreen({Key? key}) : super(key: key);
@@ -83,13 +84,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
                 await _saveDraftUserData(newUser);
 
                 // Continue with user creation
-                try {
-                  await ApiService.createUser(newUser);
-                  Navigator.pop(context, true); // Signal success to the previous screen
-                } catch (e) {
-                  // Handle the ApiException or other exceptions
-                  print('Error during user creation: $e');
-                }
+                _checkAndCreateUser(newUser);
               },
               child: const Text('Create User'),
             ),
@@ -130,5 +125,21 @@ class _NewUserScreenState extends State<NewUserScreen> {
       'status': user.status,
     };
     prefs.setString('draftUserData', json.encode(formData));
+  }
+
+  // Function to check internet connection, show dialog, and create user
+  Future<void> _checkAndCreateUser(User user) async {
+    if (await ConnectivityUtil.hasConnection()) {
+      try {
+        await ApiService.createUser(user);
+        Navigator.pop(context, true); // Signal success to the previous screen
+      } catch (e) {
+        // Handle the ApiException or other exceptions
+        print('Error during user creation: $e');
+      }
+    } else {
+      // Show a dialog if there is no internet connection
+      ConnectivityUtil.showNoInternetDialog(context);
+    }
   }
 }

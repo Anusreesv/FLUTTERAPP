@@ -1,12 +1,12 @@
+import 'package:first_app/utils/local_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:first_app/utils/connectivity_util.dart';
 import 'package:first_app/config.dart';
 import 'package:first_app/models/user.dart';
 import 'package:first_app/services/api_service.dart';
 import 'package:first_app/screens/new_user_screen.dart';
 import 'package:first_app/screens/user_details_screen.dart';
 import 'package:first_app/widgets/user_list_item.dart';
-import 'package:first_app/utils/local_storage.dart';
-import 'package:first_app/utils/connectivity_util.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -20,15 +20,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    // Initialize state if needed
     super.initState();
     // Load form data from local storage when the screen is opened
     LocalStorage.loadFormData().then((formData) {
       // Use formData as needed
     });
-
-    // Check internet connection when the screen is opened
-    checkInternetConnection();
   }
 
   Future<void> updateUser(User updatedUser) async {
@@ -40,12 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     } catch (e) {
       print('Failed to update user: $e');
-    }
-  }
-
-  Future<void> checkInternetConnection() async {
-    if (!(await ConnectivityUtil.hasConnection())) {
-      ConnectivityUtil.showNoInternetDialog(context);
     }
   }
 
@@ -104,13 +94,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  UserDetailsScreen(userList[index]),
-                            ),
-                          );
+                          // Check for internet connection when user taps on a user item
+                          checkInternetConnection(() {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    UserDetailsScreen(userList[index]),
+                              ),
+                            );
+                          });
                         },
                         child: UserListItem(
                           userList![index],
@@ -124,20 +117,34 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const NewUserScreen()),
-          ).then((value) {
-            if (value == true) {
-              setState(() {
-                users = ApiService.fetchUsers(
-                    '${AppConfig.baseUrl}${AppConfig.userListEndpoint}');
-              });
-            }
+          // Check for internet connection when user taps on the floating action button
+          checkInternetConnection(() {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NewUserScreen()),
+            ).then((value) {
+              if (value == true) {
+                setState(() {
+                  users = ApiService.fetchUsers(
+                      '${AppConfig.baseUrl}${AppConfig.userListEndpoint}');
+                });
+              }
+            });
           });
         },
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  // Function to check internet connection and execute a callback if connected
+  Future<void> checkInternetConnection(Function callback) async {
+    if (await ConnectivityUtil.hasConnection()) {
+      callback(); // Execute the provided callback if there is internet connection
+    } else {
+      // Show a dialog if there is no internet connection
+      print("No internet connection");
+      ConnectivityUtil.showNoInternetDialog(context);
+    }
   }
 }

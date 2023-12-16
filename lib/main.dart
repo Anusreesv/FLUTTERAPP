@@ -16,8 +16,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeScreen(),
-        // '/editUser': (context) => EditUserScreen(user: User(id: 1, name: "John", email: "john@example.com", status: false)),
-        // Add other routes as needed
+       
       },
     );
   }

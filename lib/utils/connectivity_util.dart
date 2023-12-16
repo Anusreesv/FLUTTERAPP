@@ -3,7 +3,7 @@ import 'package:connectivity/connectivity.dart';
 
 class ConnectivityUtil {
   static Future<bool> hasConnection() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
+    var connectivityResult = (Connectivity().onConnectivityChanged.listen);
     return connectivityResult != ConnectivityResult.none;
   }
 

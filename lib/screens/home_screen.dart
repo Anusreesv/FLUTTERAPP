@@ -95,8 +95,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       return GestureDetector(
                         onTap: () {
                           // Check for internet connection when user taps on a user item
-                          checkInternetConnection(() {
-                            Navigator.push(
+                          checkInternetConnection(() async  {
+                           await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
@@ -118,8 +118,8 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Check for internet connection when user taps on the floating action button
-          checkInternetConnection(() {
-            Navigator.push(
+          checkInternetConnection(() async{
+            await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const NewUserScreen()),
             ).then((value) {
@@ -148,3 +148,4 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 }
+

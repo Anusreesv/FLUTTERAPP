@@ -132,7 +132,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
     if (await ConnectivityUtil.hasConnection()) {
       try {
         await ApiService.createUser(user);
-        Navigator.pop(context, true); // Signal success to the previous screen
+        // Navigator.pop(context, true); // Signal success to the previous screen
       } catch (e) {
         // Handle the ApiException or other exceptions
         print('Error during user creation: $e');

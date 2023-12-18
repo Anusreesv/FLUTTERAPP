@@ -4,6 +4,7 @@ import 'package:connectivity/connectivity.dart';
 class ConnectivityUtil {
   static Future<bool> hasConnection() async {
     var connectivityResult = (Connectivity().onConnectivityChanged.listen);
+    print(ConnectivityResult);
     return connectivityResult != ConnectivityResult.none;
   }
 

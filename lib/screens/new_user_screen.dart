@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:first_app/models/user.dart';
 import 'package:first_app/services/api_service.dart';
-import 'package:first_app/utils/connectivity_util.dart'; // Import connectivity_util.dart
+import 'package:connectivity/connectivity.dart';
 
 class NewUserScreen extends StatefulWidget {
   const NewUserScreen({Key? key}) : super(key: key);
@@ -19,11 +20,59 @@ class _NewUserScreenState extends State<NewUserScreen> {
   final TextEditingController genderController = TextEditingController();
   bool status = true;
 
+  late ConnectivityResult _connectionStatus;
+  late StreamSubscription<ConnectivityResult> _subscription;
+  bool _isShowingDialog = false;
+
   @override
   void initState() {
     super.initState();
+    _connectionStatus = ConnectivityResult.none;
+    _subscription = Connectivity().onConnectivityChanged.listen((result) {
+      setState(() {
+        _connectionStatus = result;
+      });
+      _handleConnectivityChange(result);
+    });
     // Load draft user data if available
     _loadDraftUserData();
+  }
+
+  void _handleConnectivityChange(ConnectivityResult result) {
+    if (result == ConnectivityResult.none && !_isShowingDialog) {
+      // No connection, show dialog
+      _showNoInternetDialog();
+    } else if (result != ConnectivityResult.none && _isShowingDialog) {
+      // Connection restored, close dialog
+      _hideNoInternetDialog();
+    }
+  }
+
+  void _showNoInternetDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        _isShowingDialog = true;
+        return AlertDialog(
+          title: const Text('No Internet Connection'),
+          content: const Text('Please check your internet connection.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _isShowingDialog = false;
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _hideNoInternetDialog() {
+    Navigator.of(context).pop();
+    _isShowingDialog = false;
   }
 
   @override
@@ -71,20 +120,26 @@ class _NewUserScreenState extends State<NewUserScreen> {
                   return;
                 }
 
-                // Create a new user and refresh the user list
-                final newUser = User(
-                  id: 0,
-                  name: nameController.text,
-                  email: emailController.text,
-                  gender: genderController.text,
-                  status: status,
-                );
+                // Check for internet connection
+                if (_connectionStatus != ConnectivityResult.none) {
+                  // Create a new user and refresh the user list
+                  final newUser = User(
+                    id: 0,
+                    name: nameController.text,
+                    email: emailController.text,
+                    gender: genderController.text,
+                    status: status,
+                  );
 
-                // Save draft user data
-                await _saveDraftUserData(newUser);
+                  // Save draft user data
+                  await _saveDraftUserData(newUser);
 
-                // Continue with user creation
-                _checkAndCreateUser(newUser);
+                  // Continue with user creation
+                  _checkAndCreateUser(newUser);
+                } else {
+                  // Show a dialog if there is no internet connection
+                  _showNoInternetDialog();
+                }
               },
               child: const Text('Create User'),
             ),
@@ -129,7 +184,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
 
   // Function to check internet connection, show dialog, and create user
   Future<void> _checkAndCreateUser(User user) async {
-    if (await ConnectivityUtil.hasConnection()) {
+    if (_connectionStatus != ConnectivityResult.none) {
       try {
         await ApiService.createUser(user);
         // Navigator.pop(context, true); // Signal success to the previous screen
@@ -139,7 +194,13 @@ class _NewUserScreenState extends State<NewUserScreen> {
       }
     } else {
       // Show a dialog if there is no internet connection
-      ConnectivityUtil.showNoInternetDialog(context);
+      _showNoInternetDialog();
     }
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 }

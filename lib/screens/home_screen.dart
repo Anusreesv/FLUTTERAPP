@@ -1,6 +1,5 @@
 import 'package:first_app/utils/local_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:first_app/utils/connectivity_util.dart';
 import 'package:first_app/config.dart';
 import 'package:first_app/models/user.dart';
 import 'package:first_app/services/api_service.dart';
@@ -95,8 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       return GestureDetector(
                         onTap: () {
                           // Check for internet connection when user taps on a user item
-                          checkInternetConnection(() async  {
-                           await Navigator.push(
+                          checkInternetConnection(() async {
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
@@ -118,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Check for internet connection when user taps on the floating action button
-          checkInternetConnection(() async{
+          checkInternetConnection(() async {
             await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const NewUserScreen()),
@@ -139,13 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Function to check internet connection and execute a callback if connected
   Future<void> checkInternetConnection(Function callback) async {
-    if (await ConnectivityUtil.hasConnection()) {
-      callback(); // Execute the provided callback if there is internet connection
-    } else {
-      // Show a dialog if there is no internet connection
-      print("No internet connection");
-      ConnectivityUtil.showNoInternetDialog(context);
-    }
+    // Execute the provided callback if there is internet connection
+    callback();
   }
 }
-

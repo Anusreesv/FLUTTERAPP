@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:first_app/models/user.dart';
 import 'package:first_app/services/api_service.dart';
-import 'package:connectivity/connectivity.dart';
+
 
 class NewUserScreen extends StatefulWidget {
   const NewUserScreen({Key? key}) : super(key: key);
@@ -29,9 +30,6 @@ class _NewUserScreenState extends State<NewUserScreen> {
     super.initState();
     _connectionStatus = ConnectivityResult.none;
     _subscription = Connectivity().onConnectivityChanged.listen((result) {
-      setState(() {
-        _connectionStatus = result;
-      });
       _handleConnectivityChange(result);
     });
     // Load draft user data if available
@@ -196,11 +194,5 @@ class _NewUserScreenState extends State<NewUserScreen> {
       // Show a dialog if there is no internet connection
       _showNoInternetDialog();
     }
-  }
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
   }
 }

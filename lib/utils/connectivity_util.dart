@@ -1,24 +1,8 @@
 import 'dart:async';
-import 'package:first_app/screens/home_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ConnectivityWidget(
-        child: const HomeScreen(),
-      ),
-    );
-  }
-}
 
 class ConnectivityWidget extends StatefulWidget {
   final Widget child;
@@ -39,9 +23,8 @@ class _ConnectivityWidgetState extends State<ConnectivityWidget> {
     super.initState();
     _connectionStatus = ConnectivityResult.none;
     _subscription = Connectivity().onConnectivityChanged.listen((result) {
-      setState(() {
-        _connectionStatus = result;
-      });
+      print('connectivity');
+      print(result);
       _handleConnectivityChange(result);
     });
   }
@@ -96,28 +79,5 @@ class _ConnectivityWidgetState extends State<ConnectivityWidget> {
 }
 
 
-// class ConnectivityUtil {
-//   static Future<bool> hasConnection() async {
-//     var connectivityResult = (Connectivity().onConnectivityChanged.listen);
-//     print(ConnectivityResult);
-//     return connectivityResult != ConnectivityResult.none;
-//   }
 
-//   static void showNoInternetDialog(BuildContext context) {
-//     showDialog(
-//       context: context,
-//      builder: (context) => AlertDialog(
-//         title: const Text('No Internet Connection'),
-//         content: const Text('Please check your internet connection.'),
-
-//         actions: <Widget>[
-//           TextButton(
-//             onPressed: () => Navigator.of(context).pop(),
-//             child: const Text('OK'),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 

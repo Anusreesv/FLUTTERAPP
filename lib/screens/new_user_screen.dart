@@ -32,17 +32,28 @@ class _NewUserScreenState extends State<NewUserScreen> {
     _subscription = Connectivity().onConnectivityChanged.listen((result) {
       _handleConnectivityChange(result);
     });
-    // Load draft user data if available
+    
     _loadDraftUserData();
   }
 
   void _handleConnectivityChange(ConnectivityResult result) {
     if (result == ConnectivityResult.none && !_isShowingDialog) {
-      // No connection, show dialog
-      _showNoInternetDialog();
+      
+      setState(() {
+        _connectionStatus = ConnectivityResult.none;
+        _showNoInternetDialog();
+      });
     } else if (result != ConnectivityResult.none && _isShowingDialog) {
-      // Connection restored, close dialog
-      _hideNoInternetDialog();
+      
+      setState(() {
+        _connectionStatus = result;
+        _hideNoInternetDialog();
+      });
+    } else {
+      
+      setState(() {
+        _connectionStatus = result;
+      });
     }
   }
 
@@ -111,16 +122,16 @@ class _NewUserScreenState extends State<NewUserScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                // Validate email format before creating a new user
+                
                 if (!_isValidEmail(emailController.text)) {
-                  // Display an error message or handle the invalid email format
+                  
                   print('Invalid email format');
                   return;
                 }
 
-                // Check for internet connection
+                
                 if (_connectionStatus != ConnectivityResult.none) {
-                  // Create a new user and refresh the user list
+                 
                   final newUser = User(
                     id: 0,
                     name: nameController.text,
@@ -129,13 +140,13 @@ class _NewUserScreenState extends State<NewUserScreen> {
                     status: status,
                   );
 
-                  // Save draft user data
+                  
                   await _saveDraftUserData(newUser);
 
-                  // Continue with user creation
+                  
                   _checkAndCreateUser(newUser);
                 } else {
-                  // Show a dialog if there is no internet connection
+                  
                   _showNoInternetDialog();
                 }
               },
@@ -185,7 +196,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
     if (_connectionStatus != ConnectivityResult.none) {
       try {
         await ApiService.createUser(user);
-        // Navigator.pop(context, true); // Signal success to the previous screen
+        Navigator.pop(context, true); // Signal success to the previous screen
       } catch (e) {
         // Handle the ApiException or other exceptions
         print('Error during user creation: $e');

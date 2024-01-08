@@ -14,7 +14,7 @@ class EditUserScreen extends StatefulWidget {
 class _EditUserScreenState extends State<EditUserScreen> {
   late TextEditingController nameController;
   late TextEditingController emailController;
-  late TextEditingController genderController; // Add gender controller
+  late TextEditingController genderController; 
   late bool status;
 
   @override
@@ -22,7 +22,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
     super.initState();
     nameController = TextEditingController(text: widget.user.name);
     emailController = TextEditingController(text: widget.user.email);
-    genderController = TextEditingController(text: widget.user.gender); // Initialize gender controller
+    genderController = TextEditingController(text: widget.user.gender); 
     status = widget.user.status;
   }
 
@@ -64,18 +64,18 @@ class _EditUserScreenState extends State<EditUserScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                // Update the user and refresh the user list
+                
                 final updatedUser = User(
                   id: widget.user.id,
                   name: nameController.text,
                   email: emailController.text,
-                  gender: genderController.text, // Get gender from controller
+                  gender: genderController.text,
                   status: status,
                 );
 
                 await ApiService.updateUser(updatedUser);
 
-                // Update the local user object in the widget
+                
                 setState(() {
                   widget.user.name = updatedUser.name;
                   widget.user.email = updatedUser.email;
@@ -83,7 +83,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
                   widget.user.status = updatedUser.status;
                 });
 
-                Navigator.pop(context, updatedUser); // Return to the previous screen
+                Navigator.pop(context, updatedUser); 
               },
               child: const Text('Update User'),
             ),

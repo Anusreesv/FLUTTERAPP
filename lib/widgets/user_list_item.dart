@@ -15,15 +15,15 @@ class UserListItem extends StatelessWidget {
       subtitle: Text(user.email),
       trailing: GestureDetector(
         onTap: () async {
-          // Navigate to the edit screen, passing the user details
+          
           final updatedUser = await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => EditUserScreen(user: user)),
           );
 
-          // Check if the user was updated
+          
           if (updatedUser != null) {
-            // Call the provided onUpdate function to update the user
+            
             onUpdate(updatedUser);
           }
         },

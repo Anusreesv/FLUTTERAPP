@@ -22,9 +22,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Load form data from local storage when the screen is opened
+    
     LocalStorage.loadFormData().then((formData) {
-      // Use formData as needed
+      
     });
   }
 
@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print('updating user from home screen');
       print('calling update user');
       setState(() {
-        // Update the state if needed
+        
       });
     } catch (e) {
       print('Failed to update user: $e');
@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('User List'),
       ),
-      body: ConnectivityWidget( // Wrap your existing body with ConnectivityWidget
+      body: ConnectivityWidget( 
         child: FutureBuilder<List<User>>(
           future: ApiService.fetchUsers(
             '${AppConfig.baseUrl}${AppConfig.userListEndpoint}',
@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
-                            // Check for internet connection when user taps on a user item
+                            
                             checkInternetConnection(() async {
                               await Navigator.push(
                                 context,
@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Check for internet connection when user taps on the floating action button
+          
           checkInternetConnection(() async {
             await Navigator.push(
               context,
@@ -140,9 +140,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Function to check internet connection and execute a callback if connected
+  
   Future<void> checkInternetConnection(Function callback) async {
-    // Execute the provided callback if there is internet connection
+    
     callback();
   }
 }

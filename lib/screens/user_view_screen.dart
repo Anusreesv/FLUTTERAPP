@@ -20,7 +20,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              // Navigate to edit form
+              
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => UserEditForm(user: widget.user),
@@ -60,7 +60,7 @@ class _UserEditFormState extends State<UserEditForm> {
   late TextEditingController nameController;
   late TextEditingController emailController;
   late bool isUserActive;
-  late TextEditingController genderController; // Add gender controller
+  late TextEditingController genderController; 
 
   @override
   void initState() {
@@ -68,7 +68,7 @@ class _UserEditFormState extends State<UserEditForm> {
     nameController = TextEditingController(text: widget.user.name);
     emailController = TextEditingController(text: widget.user.email);
     isUserActive = widget.user.status;
-    genderController = TextEditingController(text: widget.user.gender); // Initialize gender controller
+    genderController = TextEditingController(text: widget.user.gender); 
   }
 
   @override
@@ -107,7 +107,7 @@ class _UserEditFormState extends State<UserEditForm> {
                 controller: genderController,
                 decoration: const InputDecoration(labelText: 'Gender'),
                 validator: (value) {
-                  // Add gender validation logic if needed
+                  
                   return null;
                 },
               ),
@@ -123,17 +123,14 @@ class _UserEditFormState extends State<UserEditForm> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    // Save the edited user information
+                    
                     final editedUser = User(
                       id: widget.user.id,
                       name: nameController.text,
                       email: emailController.text,
                       status: isUserActive,
-                      gender: genderController.text, // Set gender from controller
+                      gender: genderController.text, 
                     );
-
-                    // Implement API request to update user information
-                    // You can call the API service to update the user here
                   }
                 },
                 child: const Text('Save Changes'),

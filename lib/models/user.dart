@@ -3,7 +3,7 @@ class User {
   String name;
   String email;
   String gender;
-  bool status; // Change the type to bool
+  bool status; 
 
   User({
     required this.id,
@@ -19,7 +19,7 @@ class User {
       name: json['name'],
       email: json['email'],
       gender: json['gender'],
-      status: json['status'] == 'true', // Convert string to boolean
+      status: json['status'] == 'true', 
     );
   }
 
@@ -31,10 +31,10 @@ class User {
     email = newEmail;
   }
   
-  set setGender(String newGender) { // Fix the method name to setGender
-    gender = newGender; // Fix the property name to gender
+  set setGender(String newGender) {
+    gender = newGender; 
   }
-
+  
   set setStatus(dynamic newStatus) {
     status = newStatus is bool ? newStatus : newStatus.toString().toLowerCase() == 'true';
   }

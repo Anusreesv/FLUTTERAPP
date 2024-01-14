@@ -35,23 +35,26 @@ class _NewUserScreenState extends State<NewUserScreen> {
     _loadDraftUserData();
   }
 
-  void _handleConnectivityChange(ConnectivityResult result) {
-  if (result == ConnectivityResult.none) {
-    if (!_isShowingDialog) {
-      // No connection, show dialog
-      _showNoInternetDialog();
-    }
-  } else {
-    if (_isShowingDialog) {
-      // Connection restored, close dialog
-      _hideNoInternetDialog();
-    }
-  }
-
+void _handleConnectivityChange(ConnectivityResult result) {
   setState(() {
     _connectionStatus = result;
   });
+
+  if (result == ConnectivityResult.none && !_isShowingDialog) {
+    // No connection, show dialog
+    _showNoInternetDialog();
+  } else if (result != ConnectivityResult.none && _isShowingDialog) {
+    // Connection restored, close dialog
+    _hideNoInternetDialog();
+  } else if (result != ConnectivityResult.none && !_isShowingDialog) {
+    // Connection available, hide any existing dialog
+    _hideNoInternetDialog();
+  } else if (result == ConnectivityResult.none && _isShowingDialog) {
+    // Connection lost, show dialog (if not already showing)
+    _showNoInternetDialog();
+  }
 }
+
 
 
   void _showNoInternetDialog() {

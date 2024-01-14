@@ -1,7 +1,6 @@
 import 'dart:async';
-
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:first_app/models/user.dart';
 import 'package:first_app/services/api_service.dart';
 import 'package:first_app/utils/local_storage.dart';
@@ -35,27 +34,25 @@ class _NewUserScreenState extends State<NewUserScreen> {
     _loadDraftUserData();
   }
 
-void _handleConnectivityChange(ConnectivityResult result) {
-  setState(() {
-    _connectionStatus = result;
-  });
+  void _handleConnectivityChange(ConnectivityResult result) {
+    setState(() {
+      _connectionStatus = result;
+    });
 
-  if (result == ConnectivityResult.none && !_isShowingDialog) {
-    // No connection, show dialog
-    _showNoInternetDialog();
-  } else if (result != ConnectivityResult.none && _isShowingDialog) {
-    // Connection restored, close dialog
-    _hideNoInternetDialog();
-  } else if (result != ConnectivityResult.none && !_isShowingDialog) {
-    // Connection available, hide any existing dialog
-    _hideNoInternetDialog();
-  } else if (result == ConnectivityResult.none && _isShowingDialog) {
-    // Connection lost, show dialog (if not already showing)
-    _showNoInternetDialog();
+    if (result == ConnectivityResult.none && !_isShowingDialog) {
+      // No connection, show dialog
+      _showNoInternetDialog();
+    } else if (result != ConnectivityResult.none && _isShowingDialog) {
+      // Connection restored, close dialog
+      _hideNoInternetDialog();
+    } else if (result != ConnectivityResult.none && !_isShowingDialog) {
+      // Connection available, hide any existing dialog
+      _hideNoInternetDialog();
+    } else if (result == ConnectivityResult.none && _isShowingDialog) {
+      // Connection lost, show dialog (if not already showing)
+      _showNoInternetDialog();
+    }
   }
-}
-
-
 
   void _showNoInternetDialog() {
     if (!_isShowingDialog) {
@@ -142,6 +139,7 @@ void _handleConnectivityChange(ConnectivityResult result) {
 
                   await _saveDraftUserData(newUser);
                   _checkAndCreateUser(newUser);
+                  _resetForm(); // Reset the form after successful creation
                 } else {
                   _showNoInternetDialog();
                 }
@@ -194,6 +192,15 @@ void _handleConnectivityChange(ConnectivityResult result) {
     } else {
       _showNoInternetDialog();
     }
+  }
+
+  void _resetForm() {
+    setState(() {
+      nameController.text = '';
+      emailController.text = '';
+      genderController.text = '';
+      status = true;
+    });
   }
 
   @override

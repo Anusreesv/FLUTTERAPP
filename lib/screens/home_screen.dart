@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+
   Future<void> updateUser(User updatedUser) async {
     try {
       print('updating user from home screen');
@@ -120,7 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          
           checkInternetConnection(() async {
             await Navigator.push(
               context,
@@ -139,8 +139,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  
   Future<void> checkInternetConnection(Function callback) async {
     
     callback();

@@ -6,7 +6,7 @@ class UserViewScreen extends StatefulWidget {
 
   const UserViewScreen(this.user, {Key? key}) : super(key: key);
 
-  @override
+  @override 
   _UserViewScreenState createState() => _UserViewScreenState();
 }
 

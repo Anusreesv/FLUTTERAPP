@@ -30,11 +30,11 @@ class User {
   set setEmail(String newEmail) {
     email = newEmail;
   }
-  
+
   set setGender(String newGender) {
     gender = newGender; 
   }
-  
+
   set setStatus(dynamic newStatus) {
     status = newStatus is bool ? newStatus : newStatus.toString().toLowerCase() == 'true';
   }

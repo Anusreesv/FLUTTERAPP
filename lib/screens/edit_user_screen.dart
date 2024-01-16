@@ -14,7 +14,7 @@ class EditUserScreen extends StatefulWidget {
 class _EditUserScreenState extends State<EditUserScreen> {
   late TextEditingController nameController;
   late TextEditingController emailController;
-  late TextEditingController genderController; 
+  late TextEditingController genderController;
   late bool status;
 
   @override
@@ -22,7 +22,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
     super.initState();
     nameController = TextEditingController(text: widget.user.name);
     emailController = TextEditingController(text: widget.user.email);
-    genderController = TextEditingController(text: widget.user.gender); 
+    genderController = TextEditingController(text: widget.user.gender);
     status = widget.user.status;
   }
 
@@ -64,7 +64,6 @@ class _EditUserScreenState extends State<EditUserScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                
                 final updatedUser = User(
                   id: widget.user.id,
                   name: nameController.text,
@@ -75,7 +74,6 @@ class _EditUserScreenState extends State<EditUserScreen> {
 
                 await ApiService.updateUser(updatedUser);
 
-                
                 setState(() {
                   widget.user.name = updatedUser.name;
                   widget.user.email = updatedUser.email;
@@ -83,7 +81,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
                   widget.user.status = updatedUser.status;
                 });
 
-                Navigator.pop(context, updatedUser); 
+                Navigator.pop(context, updatedUser);
               },
               child: const Text('Update User'),
             ),

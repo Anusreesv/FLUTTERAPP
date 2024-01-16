@@ -186,6 +186,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
       try {
         await ApiService.createUser(user);
         Navigator.pop(context, true);
+        _resetForm();
       } catch (e) {
         print('Error during user creation: $e');
       }

@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
-
 
 class ConnectivityWidget extends StatefulWidget {
   final Widget child;
@@ -23,13 +21,15 @@ class _ConnectivityWidgetState extends State<ConnectivityWidget> {
     super.initState();
     _connectionStatus = ConnectivityResult.none;
     _subscription = Connectivity().onConnectivityChanged.listen((result) {
-      print('connectivity');
-      print(result);
       _handleConnectivityChange(result);
     });
   }
 
   void _handleConnectivityChange(ConnectivityResult result) {
+    setState(() {
+      _connectionStatus = result;
+    });
+
     if (result == ConnectivityResult.none && !_isShowingDialog) {
       // No connection, show dialog
       _showNoInternetDialog();
@@ -46,7 +46,9 @@ class _ConnectivityWidgetState extends State<ConnectivityWidget> {
         _isShowingDialog = true;
         return AlertDialog(
           title: const Text('No Internet Connection'),
-          content: const Text('Please check your internet connection.'),
+          content: _connectionStatus == ConnectivityResult.none
+              ? const Text('Please check your internet connection.')
+              : const Text('Internet connection lost.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -77,7 +79,3 @@ class _ConnectivityWidgetState extends State<ConnectivityWidget> {
     return widget.child;
   }
 }
-
-
-
-

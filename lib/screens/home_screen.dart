@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:first_app/utils/connectivity_util.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/utils/local_storage.dart';
@@ -140,7 +141,30 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
   Future<void> checkInternetConnection(Function callback) async {
-    
+  var connectivityResult = await (Connectivity().checkConnectivity());
+
+  if (connectivityResult != ConnectivityResult.none) {
+    // If connected, execute the callback
     callback();
+  } else {
+    // If not connected, show a dialog
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('No Internet Connection'),
+          content: const Text('Please check your internet connection.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
+}
 }

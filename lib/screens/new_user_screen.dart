@@ -128,21 +128,22 @@ class _NewUserScreenState extends State<NewUserScreen> {
                   return;
                 }
 
-                if (_connectionStatus != ConnectivityResult.none) {
-                  final newUser = User(
-                    id: 0,
-                    name: nameController.text,
-                    email: emailController.text,
-                    gender: genderController.text,
-                    status: status,
-                  );
-
-                  await _saveDraftUserData(newUser);
-                  _checkAndCreateUser(newUser);
-                  _resetForm(); // Reset the form after successful creation
-                } else {
+                if (_connectionStatus == ConnectivityResult.none) {
                   _showNoInternetDialog();
+                  return;
                 }
+
+                final newUser = User(
+                  id: 0,
+                  name: nameController.text,
+                  email: emailController.text,
+                  gender: genderController.text,
+                  status: status,
+                );
+
+                await _saveDraftUserData(newUser);
+                _checkAndCreateUser(newUser);
+                _resetForm(); // Reset the form after successful creation
               },
               child: const Text('Create User'),
             ),
@@ -181,22 +182,21 @@ class _NewUserScreenState extends State<NewUserScreen> {
     await LocalStorage.saveFormData(formData);
   }
 
-Future<void> _checkAndCreateUser(User user) async {
-  if (_connectionStatus != ConnectivityResult.none) {
-    try {
-      await ApiService.createUser(user);
-      Navigator.pop(context, true);
-      _resetForm();
-    } catch (e) {
-      print('Error during user creation: $e');
-      // Don't reset the form, show no internet dialog instead
+  Future<void> _checkAndCreateUser(User user) async {
+    if (_connectionStatus != ConnectivityResult.none) {
+      try {
+        await ApiService.createUser(user);
+        Navigator.pop(context, true);
+        _resetForm();
+      } catch (e) {
+        print('Error during user creation: $e');
+        // Don't reset the form, show no internet dialog instead
+        _showNoInternetDialog();
+      }
+    } else {
       _showNoInternetDialog();
     }
-  } else {
-    _showNoInternetDialog();
   }
-}
-
 
   void _resetForm() {
     setState(() {
